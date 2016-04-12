@@ -1,0 +1,30 @@
+{
+  "name": "hubot-line",
+  "version": "0.0.1",
+  "description": "A hubot adapter for LINE",
+  "keywords": [
+    "hubot",
+    "line"
+  ],
+  "author": "umakoz",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/umakoz/hubot-line.git"
+  },
+  "bugs": {
+    "url": "https://github.com/umakoz/hubot-line/issues"
+  },
+  "dependencies": {
+    "https-proxy-agent": "~1.0.0"
+  },
+  "devDependencies": {
+    "coffee-script": "~1.6.3",
+    "hubot": "~2.11"
+  },
+  "engines": {
+    "node": ">= 0.8.x",
+    "npm": ">= 1.1.x"
+  },
+  "main": "./src/line"
+}
