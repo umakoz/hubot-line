@@ -28,7 +28,7 @@ class LineAdapter extends Adapter
       channel_secret: process.env.HUBOT_LINE_CHANNEL_SECRET
       channel_mid:    process.env.HUBOT_LINE_CHANNEL_MID
       callback_path:  process.env.HUBOT_LINE_CALLBACK_PATH or '/hubot/line/callback'
-      proxy:          process.env.HUBOT_LINE_PROXY or process.env.FIXIE_URL
+      proxy:          process.env.HUBOT_LINE_PROXY_URL or process.env.FIXIE_URL
 
     bot = new LineStreaming(options, @robot)
 
