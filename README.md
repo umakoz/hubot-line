@@ -34,7 +34,7 @@ The following environment variables must be defined.
 The following environment variables are optional.
 
 | Variable name | Default value | Description |
-|---|---|
+|---|---|---|
 | HUBOT_LINE_PROXY_URL | (NULL) | Primary url for tunneling through a HTTP proxy |
 | FIXIE_URL | (NULL) | Secondary url for tunneling through a HTTP proxy<br> This value is ready for [Fixie](https://elements.heroku.com/addons/fixie) |
 | HUBOT_LINE_CALLBACK_PATH | /hubot/line/callback | Path to receive requests sent from the LINE platform |
