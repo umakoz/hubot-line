@@ -76,7 +76,7 @@ class LineStreaming extends EventEmitter
 
   send: (to, message) ->
     logger = @robot.logger
-    logger.debug "LINE send #{message} to #{to}"
+    logger.debug "LINE send [#{message}] to [#{to}]"
 
     body = JSON.stringify
       to:        [to]
@@ -86,7 +86,7 @@ class LineStreaming extends EventEmitter
         contentType: 1
         toType:      1
         text:        message
-    logger.debug "LINE send body #{body}"
+    logger.debug "LINE send body [#{body}]"
 
     headers =
       'Content-Type':   'application/json; charset=UTF-8'
@@ -105,24 +105,24 @@ class LineStreaming extends EventEmitter
     if @options.proxy
       opts.agent = new HttpsProxyAgent @options.proxy
 
-    logger.debug "LINE send opts #{JSON.stringify(opts)}"
+    logger.debug "LINE send opts [#{JSON.stringify(opts)}]"
 
     request = Https.request opts, (response) ->
       response.setEncoding('utf8')
-      logger.debug "LINE response statusCode: #{response.statusCode}"
+      logger.debug "LINE response statusCode [#{response.statusCode}]"
 
       buffer = ''
       response.on 'data', (data) ->
-        logger.debug "LINE response data: #{data}"
+        logger.debug "LINE response data [#{data}]"
 
       response.on 'end', () ->
         logger.debug "LINE response end"
 
       response.on 'error', (error) ->
-        logger.error "LINE send response error: #{error}"
+        logger.error "LINE send response error [#{error}]"
 
     request.on 'error', (error) ->
-      logger.error "LINE send request error: #{error}"
+      logger.error "LINE send request error [#{error}]"
 
     request.end(body)
 
