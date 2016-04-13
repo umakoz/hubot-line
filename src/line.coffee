@@ -130,7 +130,7 @@ class LineStreaming extends EventEmitter
 
   listen: ->
     @robot.router.post @options.callback_path, (request, response) =>
-      @robot.logger.debug "LINE listen [#{JSON.stringify(request)}]"
+      @robot.logger.debug "LINE listen [#{JSON.stringify(request.body.result)}]"
       for result in request.body.result
         content = result.content
         @emit 'message', content.from, content.contentType, content.contentMetadata, content.text, content.location
