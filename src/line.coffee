@@ -32,10 +32,26 @@ class LineAdapter extends Adapter
 
     bot = new LineStreaming(options, @robot)
 
-    bot.on 'message', (mid, message) ->
-      @robot.logger.debug "LINE message #{message} from #{mid}"
-      user = @robot.brain.userForId mid
-      self.receive new TextMessage user, message
+    bot.on 'message', (from, contentType, contentMetadata, text, location) ->
+      user = @robot.brain.userForId from
+      switch contentType
+        when 1
+          @robot.logger.debug "LINE text message [#{text}] from [#{from}]"
+          self.receive new TextMessage user, text
+        when 2
+          @robot.logger.debug "LINE image message [#{text}] from [#{from}] contentMetadata [#{JSON.stringify(contentMetadata)}] location [#{JSON.stringify(location)}]"
+        when 3
+          @robot.logger.debug "LINE video message [#{text}] from [#{from}] contentMetadata [#{JSON.stringify(contentMetadata)}] location [#{JSON.stringify(location)}]"
+        when 4
+          @robot.logger.debug "LINE audio message [#{text}] from [#{from}] contentMetadata [#{JSON.stringify(contentMetadata)}] location [#{JSON.stringify(location)}]"
+        when 7
+          @robot.logger.debug "LINE location message [#{text}] from [#{from}] contentMetadata [#{JSON.stringify(contentMetadata)}] location [#{JSON.stringify(location)}]"
+        when 8
+          @robot.logger.debug "LINE sticker message [#{text}] from [#{from}] contentMetadata [#{JSON.stringify(contentMetadata)}] location [#{JSON.stringify(location)}]"
+        when 10
+          @robot.logger.debug "LINE contact message [#{text}] from [#{from}] contentMetadata [#{JSON.stringify(contentMetadata)}] location [#{JSON.stringify(location)}]"
+        else
+          @robot.logger.error "LINE unknown message [#{text}] from [#{from}] contentType [#{contentType}] contentMetadata [#{JSON.stringify(contentMetadata)}] location [#{JSON.stringify(location)}]"
 
     bot.listen()
 
@@ -113,10 +129,9 @@ class LineStreaming extends EventEmitter
 
   listen: ->
     @robot.router.post @options.callback_path, (request, response) =>
+      @robot.logger.debug "LINE listen [#{JSON.stringify(request)}]"
       for result in request.body.result
-        mid = result.content.from
-        message = result.content.text
-        @robot.logger.debug "LINE listen #{message} from #{mid}"
-        @emit 'message', mid, message
+        content = result.content
+        @emit 'message', content.from, content.contentType, content.contentMetadata, content.text, content.location
       response.send 'OK'
 
