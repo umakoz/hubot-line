@@ -89,6 +89,7 @@ class LineStreaming extends EventEmitter
     logger.debug "LINE send body [#{body}]"
 
     headers =
+      'User-Agent':     "Hubot/#{@robot?.version} (#{@robot?.name})"
       'Content-Type':   'application/json; charset=UTF-8'
       'Content-Length': body.length
       'X-Line-ChannelID':             @options.channel_id
