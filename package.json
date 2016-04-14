@@ -1,9 +1,10 @@
 {
   "name": "hubot-line",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A hubot adapter for LINE",
   "keywords": [
     "hubot",
+    "adapter",
     "line"
   ],
   "author": "umakoz",
@@ -19,12 +20,12 @@
     "https-proxy-agent": "~1.0.0"
   },
   "devDependencies": {
-    "coffee-script": "~1.6.3",
+    "coffee-script": "~1.7.1",
     "hubot": "~2.11"
   },
   "engines": {
     "node": ">= 0.8.x",
     "npm": ">= 1.1.x"
   },
-  "main": "./src/line"
+  "main": "./index"
 }
