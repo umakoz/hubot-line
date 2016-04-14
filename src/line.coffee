@@ -96,7 +96,7 @@ class LineStreaming extends EventEmitter
     logger = @robot.logger
     logger.debug "LINE send [#{message}] to [#{to}]"
 
-    body = JSON.stringify
+    body = querystring.stringify
       to:        [to]
       toChannel: 1383378250 # Fixed value
       eventType: "138311608800106203" # Fixed value
