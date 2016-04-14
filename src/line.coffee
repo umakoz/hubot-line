@@ -96,7 +96,7 @@ class LineStreaming extends EventEmitter
     logger = @robot.logger
     logger.debug "LINE send [#{message}] to [#{to}]"
 
-    body = querystring.stringify
+    body = JSON.stringify
       to:        [to]
       toChannel: 1383378250 # Fixed value
       eventType: "138311608800106203" # Fixed value
@@ -104,6 +104,8 @@ class LineStreaming extends EventEmitter
         contentType: 1
         toType:      1
         text:        message
+    body = body.replace /[\u0080-\uFFFF]/g, (match) ->
+      escape(match).replace /%u/g, "\\u"
     logger.debug "LINE send body [#{body}]"
 
     headers =
