@@ -143,7 +143,7 @@ class LineStreaming extends EventEmitter
     request.on 'error', (error) ->
       logger.error "LINE send request error [#{error}]"
 
-    request.end(body)
+    request.end body, 'utf8'
 
 
   listen: ->
