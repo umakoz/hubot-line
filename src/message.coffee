@@ -68,18 +68,11 @@ class LineLocationMessage extends LineRawMessage
   # contentMetadata - Detailed information about the message.
   # location        - Location data. This property is defined if the text message sent contains location data.
   constructor: (@user, @id, @contentType, @contentMetadata, @location) ->
-
-  title: ->
-    @location.title
-
-  address: ->
-    @location.address
-
-  latitude: ->
-    @location.latitude
-
-  longitude: ->
-    @location.longitude
+    @title = @location.title
+    @address = @location.address
+    @latitude = @location.latitude
+    @longitude = @location.longitude
+    super @user, @id, @contentType, @contentMetadata, @location
 
 
 
@@ -92,18 +85,11 @@ class LineStickerMessage extends LineRawMessage
   # contentMetadata - Detailed information about the message.
   # location        - Location data. This property is defined if the text message sent contains location data.
   constructor: (@user, @id, @contentType, @contentMetadata, @location = "") ->
-
-  STKPKGID: ->
-    @contentMetadata.STKPKGID
-
-  STKID: ->
-    @contentMetadata.STKID
-
-  STKVER: ->
-    @contentMetadata.STKVER
-
-  STKTXT: ->
-    @contentMetadata.STKTXT
+    @STKPKGID = @contentMetadata.STKPKGID
+    @STKID = @contentMetadata.STKID
+    @STKVER = @contentMetadata.STKVER
+    @STKTXT = @contentMetadata.STKTXT
+    super @user, @id, @contentType, @contentMetadata, @location
 
 
 
@@ -116,12 +102,9 @@ class LineContactMessage extends LineRawMessage
   # contentMetadata - Detailed information about the message.
   # location        - Location data. This property is defined if the text message sent contains location data.
   constructor: (@user, @id, @contentType, @contentMetadata, @location = "") ->
-
-  mid: ->
-    @contentMetadata.mid
-
-  displayName: ->
-    @contentMetadata.displayName
+    @mid = @contentMetadata.mid
+    @displayName = @contentMetadata.displayName
+    super @user, @id, @contentType, @contentMetadata, @location
 
 
 
@@ -145,9 +128,8 @@ class LineFriendOperation extends LineRawOperation
   # opType - Type of operation
   # params - Array of MIDs
   constructor: (@user, @opType, @params) ->
-
-  mid: ->
-    @params[0]
+    @mid = @params[0]
+    super @user, @opType, @params
 
 
 
@@ -158,9 +140,8 @@ class LineBlockOperation extends LineRawOperation
   # opType - Type of operation
   # params - Array of MIDs
   constructor: (@user, @opType, @params) ->
-
-  mid: ->
-    @params[0]
+    @mid = @params[0]
+    super @user, @opType, @params
 
 
 
