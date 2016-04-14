@@ -45,34 +45,99 @@ The following environment variables are optional.
     $ heroku config:add HUBOT_LINE_CHANNEL_SECRET="your_channel_secret"
     $ heroku config:add HUBOT_LINE_CHANNEL_MID="your_channel_mid"
 
-The BOT APIs can only be called from registered servers. So you must use a service provides your Heroku application with a fixed set of static IP addresses for outbound requests.  
+The BOT APIs can only be called from registered servers. So you must use a service that provides your Heroku application with a fixed set of static IP addresses for outbound requests.  
 If you want to use [Fixie](https://elements.heroku.com/addons/fixie), execute a following heroku command. This command set `FIXIE_URL` automatically.
 
-    $ heroku addons:create fixie:tricycle
+```sh
+$ heroku addons:create fixie:tricycle
+```
 
 If you want to use the other service, please set `HUBOT_LINE_PROXY_URL` like below.
 
-    $ heroku config:add HUBOT_LINE_PROXY_URL="your_proxy_url"
+```sh
+$ heroku config:add HUBOT_LINE_PROXY_URL="your_proxy_url"
+```
 
 If you want to change a callback url, you should set `HUBOT_LINE_CALLBACK_PATH` like following.
 
-    $ heroku config:add HUBOT_LINE_CALLBACK_PATH="/path/to/callback"
+```sh
+$ heroku config:add HUBOT_LINE_CALLBACK_PATH="/path/to/callback"
+```
 
 ### Non-Heroku environment variables
 
-    $ export HUBOT_LINE_CHANNEL_ID="your_channel_id"
-    $ export HUBOT_LINE_CHANNEL_SECRET="your_channel_secret"
-    $ export HUBOT_LINE_CHANNEL_MID="your_channel_mid"
+```sh
+$ export HUBOT_LINE_CHANNEL_ID="your_channel_id"
+$ export HUBOT_LINE_CHANNEL_SECRET="your_channel_secret"
+$ export HUBOT_LINE_CHANNEL_MID="your_channel_mid"
+```
 
 The following environment variables are optional.
 
-    $ export HUBOT_LINE_CALLBACK_PATH="/path/to/callback"
-    $ export HUBOT_LINE_PROXY_URL="your_proxy_url"
+```sh
+$ export HUBOT_LINE_CALLBACK_PATH="/path/to/callback"
+$ export HUBOT_LINE_PROXY_URL="your_proxy_url"
+```
 
 ### LINE Platform
 
 You will need to register a callback URL on LINE Platform. Please refer to [Registering a callback URL](https://developers.line.me/bot-api/getting-started-with-bot-api-trial#register_callback_url).  
 You need to register IP addresses on your server whitelist. Please refer to [Server whitelist](https://developers.line.me/bot-api/getting-started-with-bot-api-trial#whitelists).
+
+## Scripting
+
+### Listening
+
+This adapter can listen LINE features as messages. LINE features this library supported are image and video, audio, location, sticker, contact, friend, block.  
+To listen, you need to register a listener in your own script. For example, if you want to listen to when hubot receives any sticker, you can write as follows.
+
+```coffeescript
+{LineStickerListener} = require 'hubot-line'
+
+module.exports = (robot) ->
+  robot.listeners.push new LineStickerListener robot, (() -> true), (res) ->
+    res.send "Receiced a sticker. id: #{res.message.id} STKPKGID: #{res.message.STKPKGID}"
+```
+
+Listener constructor has 3 parameters.
+
+* robot - A Robot instance.
+* matcher - A Function that determines if this listener should trigger the callback.
+* callback - A Function that is triggered if the incoming message matches.
+
+Callback parameter contains the message property, and all of messages have a property of id.
+
+#### Listeners
+
+Listeners are provided for each LINE feature.
+
+* LineImageListener - Listen image messages
+* LineVideoListener - Listen video messages
+* LineAudioListener - Listen audio messages
+* LineLocationListener - Listen location messages  
+A location message has extra properties.  
+    * title - "Location data" string
+    * address
+    * latitude
+    * longitude
+* LineStickerListener - Listen sticker messages  
+A sticker message has extra properties..  
+    * STKPKGID - The package ID of the sticker
+    * STKID - The sticker ID
+    * STKVER - The sticker’s version number
+    * STKTXT - The text of the sticker
+* LineContactListener - Listen contact messages  
+A contact message has extra properties.  
+    * mid - The MID value of the person sent as this contact
+    * displayName - The nickname of the person sent as this contact
+* LineRawMessageListener - Listen features that summarized followings: image and video, audio, location, sticker, contact
+* LineFriendListener - Listen operations that added as friend (including canceling block)
+A friend message has extra properties.  
+    * mid - MID of user who added your account as a friend
+* LineBlockListener - Listen operations that blocked bot account
+A block message has extra properties.  
+    * mid - MID of user who blocked your account
+* LineRawOperationListener - Listen operations that summarized the followings: friend, block
 
 ## Contribute
 
