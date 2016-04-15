@@ -3,6 +3,7 @@ Https = require 'https'
 HttpsProxyAgent = require 'https-proxy-agent'
 {EventEmitter} = require 'events'
 {LineRawMessage, LineImageMessage, LineVideoMessage, LineAudioMessage, LineLocationMessage, LineStickerMessage, LineContactMessage, LineRawOperation, LineFriendOperation, LineBlockOperation} = require './message'
+{LineAction, LineTextAction, LineImageAction, LineVideoAction, LineAudioAction, LineLocationAction, LineStickerAction} = require './action'
 
 
 
@@ -18,6 +19,12 @@ class LineAdapter extends Adapter
     @robot.logger.debug 'LINE reply'
     to = envelope.user.name
     @bot.send to, str for str in strings
+
+
+  emote: (envelope, actions...) ->
+    @robot.logger.debug 'LINE emote'
+    to = envelope.user.name
+    @bot.emote to, act for act in actions
 
 
   run: ->
@@ -93,23 +100,31 @@ class LineStreaming extends EventEmitter
 
 
   send: (to, message) ->
-    logger = @robot.logger
-    logger.debug "LINE send [#{message}] to [#{to}]"
+    @robot.logger.debug "LINE send [#{message}] to [#{to}]"
+    @_send to, new LineTextAction message
 
+
+  emote: (to, action) ->
+    if action instanceof LineAction
+      @robot.logger.debug "LINE emote #{action.constructor.name} to [#{to}]"
+      @_send to, action
+    else
+      @robot.logger.error "LINE emote is ignored. emote supports LineAction only. to [#{to}]"
+
+
+  _send: (to, action) ->
+    logger = @robot.logger
     body = JSON.stringify
       to:        [to]
       toChannel: 1383378250 # Fixed value
       eventType: "138311608800106203" # Fixed value
-      content:
-        contentType: 1
-        toType:      1
-        text:        message
+      content: action.requestParameters()
     body = body.replace /[\u0080-\uFFFF]/g, (match) ->
       escape(match).replace /%u/g, "\\u"
     logger.debug "LINE send body [#{body}]"
 
     headers =
-      'User-Agent':     "Hubot/#{@robot?.version} (#{@robot?.name})"
+      'User-Agent':     "Hubot/#{@robot?.version}"
       'Content-Type':   'application/json; charset=UTF-8'
       'Content-Length': body.length
       'X-Line-ChannelID':             @options.channel_id

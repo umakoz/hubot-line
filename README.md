@@ -86,9 +86,9 @@ You need to register IP addresses on your server whitelist. Please refer to [Ser
 
 ## Scripting
 
-### Listening
+### Listen
 
-This adapter can listen LINE features as messages. LINE features this library supported are image and video, audio, location, sticker, contact, friend, block.  
+This adapter can listen LINE actions as messages. LINE actions this library can listen are image and video, audio, location, sticker, contact, friend, block.  
 To listen, you need to register a listener in your own script. For example, if you want to listen to when hubot receives any sticker, you can write as follows.
 
 ```coffeescript
@@ -105,11 +105,11 @@ Listener constructor has 3 parameters.
 * matcher - A Function that determines if this listener should trigger the callback.
 * callback - A Function that is triggered if the incoming message matches.
 
-Callback parameter contains the message property, and all of messages have a property of id.
+Callback parameter `res` contains the message property, and all of messages have a property of id.
 
 #### Listeners
 
-Listeners are provided for each LINE feature.
+Listeners are provided for each LINE action.
 
 * LineImageListener - Listen image messages
 * LineVideoListener - Listen video messages
@@ -117,11 +117,11 @@ Listeners are provided for each LINE feature.
 * LineLocationListener - Listen location messages  
 A location message has extra properties.  
     * title - "Location data" string
-    * address
-    * latitude
-    * longitude
+    * address - Address
+    * latitude - Latitude
+    * longitude - Longitude
 * LineStickerListener - Listen sticker messages  
-A sticker message has extra properties..  
+A sticker message has extra properties.  
     * STKPKGID - The package ID of the sticker
     * STKID - The sticker ID
     * STKVER - The sticker’s version number
@@ -130,14 +130,58 @@ A sticker message has extra properties..
 A contact message has extra properties.  
     * mid - The MID value of the person sent as this contact
     * displayName - The nickname of the person sent as this contact
-* LineRawMessageListener - Listen features that summarized followings: image and video, audio, location, sticker, contact
-* LineFriendListener - Listen operations that added as friend (including canceling block)
+* LineRawMessageListener - Listen actions that summarized followings: image and video, audio, location, sticker, contact
+* LineFriendListener - Listen operations that added as friend (including canceling block)  
 A friend message has extra properties.  
     * mid - MID of user who added your account as a friend
-* LineBlockListener - Listen operations that blocked bot account
+* LineBlockListener - Listen operations that blocked bot account  
 A block message has extra properties.  
     * mid - MID of user who blocked your account
 * LineRawOperationListener - Listen operations that summarized the followings: friend, block
+
+### Emote
+
+The `res` parameter is an instance of Response. With it, you can emote a line action. For example:
+
+```coffeescript
+module.exports = (robot) ->
+  robot.listeners.push new LineStickerListener robot, (() -> true), (res) ->
+    res.emote new LineStickerAction res.message.STKID, res.message.STKPKGID
+```
+
+Above an example, LineStickerListener emote a sticker action that sender did.
+To emote a sticker, place 2 parameters, STKID and STKPKGID.  
+LINE actions this library can emote are text and image, video, audio, location, sticker.  
+
+#### Actions
+
+This library has following LINE actions.
+
+* LineTextAction - Emote texts  
+A text action has a parameter.  
+    * text - String you want to send. Messages can contain up to 1024 characters.
+* LineImageAction - Emote images  
+A image action has 2 parameters.  
+    * originalContentUrl - URL of image. Only JPEG format supported. Image size cannot be larger than 1024×1024
+    * previewImageUrl - URL of thumbnail image. For preview. Only JPEG format supported. Image size cannot be larger than 240×240
+* LineVideoAction - Emote videos  
+A video action has 2 parameters.  
+    * originalContentUrl - URL of the movie. The "mp4" format is recommended
+    * previewImageUrl - URL of thumbnail image used as a preview
+* LineAudioAction - Emote audios  
+A audio action has 2 parameters.  
+    * originalContentUrl - URL of audio file. The "m4a" format is recommended
+    * AUDLEN - Length of voice message. The unit is given in milliseconds
+* LineLocationAction - Emote locations  
+A location action has 3 parameters.  
+    * title - String used to explain the location information (example: name of restaurant, address)
+    * latitude - Latitude
+    * longitude - Loingitude
+* LineStickerAction - Emote stickers  
+You can use the stickers shown in the [sticker list](https://developers.line.me/wp-content/uploads/2016/04/sticker_list.xlsx). A sticker action has 3 parameters.  
+    * STKID - ID of the sticker
+    * STKPKGID - Package ID of the sticker
+    * STKVER - Optional. Version number of the sticker. If omitted, the latest version number is applied
 
 ## Contribute
 
