@@ -1,5 +1,4 @@
 {Robot, Adapter, TextMessage} = require 'hubot'
-Https = require 'https'
 HttpsProxyAgent = require 'https-proxy-agent'
 {EventEmitter} = require 'events'
 {LineRawMessage, LineImageMessage, LineVideoMessage, LineAudioMessage, LineLocationMessage, LineStickerMessage, LineContactMessage, LineRawOperation, LineFriendOperation, LineBlockOperation} = require './message'
@@ -98,21 +97,32 @@ class LineStreaming extends EventEmitter
   constructor: (options, @robot) ->
     @options = options
 
+    @robot.globalHttpOptions =
+      protocol: 'https:'
+      hostname: 'trialbot-api.line.me'
+      port:     443
+      headers:
+        'X-Line-ChannelID':             @options.channel_id
+        'X-Line-ChannelSecret':         @options.channel_secret
+        'X-Line-Trusted-User-With-ACL': @options.channel_mid
+    if @options.proxy
+      @robot.globalHttpOptions.agent = new HttpsProxyAgent @options.proxy
+
 
   send: (to, message) ->
     @robot.logger.debug "LINE send [#{message}] to [#{to}]"
-    @_send to, new LineTextAction message
+    @_request to, new LineTextAction message
 
 
   emote: (to, action) ->
     if action instanceof LineAction
       @robot.logger.debug "LINE emote #{action.constructor.name} to [#{to}]"
-      @_send to, action
+      @_request to, action
     else
       @robot.logger.error "LINE emote is ignored. emote supports LineAction only. to [#{to}]"
 
 
-  _send: (to, action) ->
+  _request: (to, action) ->
     logger = @robot.logger
     body = JSON.stringify
       to:        [to]
@@ -121,46 +131,16 @@ class LineStreaming extends EventEmitter
       content: action.requestParameters()
     body = body.replace /[\u0080-\uFFFF]/g, (match) ->
       escape(match).replace /%u/g, "\\u"
-    logger.debug "LINE send body [#{body}]"
+    logger.debug "LINE _request body [#{body}]"
 
-    headers =
-      'User-Agent':     "Hubot/#{@robot?.version}"
-      'Content-Type':   'application/json; charset=UTF-8'
-      'Content-Length': body.length
-      'X-Line-ChannelID':             @options.channel_id
-      'X-Line-ChannelSecret':         @options.channel_secret
-      'X-Line-Trusted-User-With-ACL': @options.channel_mid
-
-    opts =
-      host:    'trialbot-api.line.me'
-      port:    443
-      path:    '/v1/events'
-      method:  'POST'
-      headers: headers
-
-    if @options.proxy
-      opts.agent = new HttpsProxyAgent @options.proxy
-
-    logger.debug "LINE send opts [#{JSON.stringify(opts)}]"
-
-    request = Https.request opts, (response) ->
-      response.setEncoding('utf8')
-      logger.debug "LINE response statusCode [#{response.statusCode}]"
-
-      buffer = ''
-      response.on 'data', (data) ->
-        logger.debug "LINE response data [#{data}]"
-
-      response.on 'end', () ->
-        logger.debug "LINE response end"
-
-      response.on 'error', (error) ->
-        logger.error "LINE send response error [#{error}]"
-
-    request.on 'error', (error) ->
-      logger.error "LINE send request error [#{error}]"
-
-    request.end body, 'utf8'
+    @robot.http({}, {})
+      .path("/v1/events")
+      .header('Content-Type', 'application/json')
+      .post(body) (err, res, body) ->
+        logger.debug "LINE _request response statusCode [#{res.statusCode}]"
+        logger.debug "LINE _request response body [#{body}]"
+        if err
+          logger.error "LINE _request response error [#{err}]"
 
 
   listen: ->
