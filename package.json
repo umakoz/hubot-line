@@ -1,6 +1,6 @@
 {
   "name": "hubot-line",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A hubot adapter for LINE",
   "keywords": [
     "hubot",
