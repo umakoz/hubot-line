@@ -112,8 +112,16 @@ Callback parameter `res` contains the message property, and all of messages have
 Listeners are provided for each LINE action.
 
 * LineImageListener - Listen image messages
+A image message has extra methods. (Refer to following content and previewContent section)  
+    * content - a user’s image
+    * previewContent - a thumbnail preview
 * LineVideoListener - Listen video messages
+A video message has extra methods. (Refer to following content and previewContent section)  
+    * content - a user’s video
+    * previewContent - a thumbnail preview
 * LineAudioListener - Listen audio messages
+A audio message has extra methods. (Refer to following content and previewContent section)  
+    * content - a user’s audio
 * LineLocationListener - Listen location messages  
 A location message has extra properties.  
     * title - "Location data" string
@@ -139,11 +147,31 @@ A block message has extra properties.
     * mid - MID of user who blocked your account
 * LineRawOperationListener - Listen operations that summarized the followings: friend, block
 
+##### Content and previewContent
+
+LINE image and video messages have content and previewContent that users send. Also audio messages have content.
+You can retrieve the content and previewContent of a user’s message like following.
+
+```coffeescript
+{LineImageListener} = require 'hubot-line'
+
+module.exports = (robot) ->
+  robot.listeners.push new LineImageListener robot, (() -> true), (res) ->
+    res.message.content (content) ->
+      res.message.previewContent (previewContent) ->
+        # process binary data of content and previewContent.
+```
+
+Please process binary data of content and previewContent, as you want.
+
+
 ### Emote
 
 The `res` parameter is an instance of Response. With it, you can emote a line action. For example:
 
 ```coffeescript
+{LineStickerListener, LineStickerAction} = require 'hubot-line'
+
 module.exports = (robot) ->
   robot.listeners.push new LineStickerListener robot, (() -> true), (res) ->
     res.emote new LineStickerAction res.message.STKID, res.message.STKPKGID
