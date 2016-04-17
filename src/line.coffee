@@ -47,25 +47,25 @@ class LineAdapter extends Adapter
           self.receive new TextMessage user, text
         when 2
           @robot.logger.debug "LINE image message from [#{from}] id [#{id}] contentMetadata [#{JSON.stringify(contentMetadata)}]"
-          self.receive new LineImageMessage user, id, contentType, contentMetadata
+          self.receive new LineImageMessage user, @robot, id, contentType, contentMetadata
         when 3
           @robot.logger.debug "LINE video message from [#{from}] id [#{id}] contentMetadata [#{JSON.stringify(contentMetadata)}]"
-          self.receive new LineVideoMessage user, id, contentType, contentMetadata
+          self.receive new LineVideoMessage user, @robot, id, contentType, contentMetadata
         when 4
           @robot.logger.debug "LINE audio message from [#{from}] id [#{id}] contentMetadata [#{JSON.stringify(contentMetadata)}]"
-          self.receive new LineAudioMessage user, id, contentType, contentMetadata
+          self.receive new LineAudioMessage user, @robot, id, contentType, contentMetadata
         when 7
           @robot.logger.debug "LINE location message from [#{from}] id [#{id}] contentMetadata [#{JSON.stringify(contentMetadata)}] location [#{JSON.stringify(location)}]"
-          self.receive new LineLocationMessage user, id, contentType, contentMetadata, location
+          self.receive new LineLocationMessage user, @robot, id, contentType, contentMetadata, location
         when 8
           @robot.logger.debug "LINE sticker message from [#{from}] id [#{id}] contentMetadata [#{JSON.stringify(contentMetadata)}]"
-          self.receive new LineStickerMessage user, id, contentType, contentMetadata
+          self.receive new LineStickerMessage user, @robot, id, contentType, contentMetadata
         when 10
           @robot.logger.debug "LINE contact message from [#{from}] id [#{id}] contentMetadata [#{JSON.stringify(contentMetadata)}]"
-          self.receive new LineContactMessage user, id, contentType, contentMetadata
+          self.receive new LineContactMessage user, @robot, id, contentType, contentMetadata
         else
           @robot.logger.error "LINE unknown message [#{text}] from [#{from}] id [#{id}] contentType [#{contentType}] contentMetadata [#{JSON.stringify(contentMetadata)}] location [#{JSON.stringify(location)}]"
-          self.receive new LineRawMessage user, id, contentType, contentMetadata, location
+          self.receive new LineRawMessage user, @robot, id, contentType, contentMetadata, location
 
     bot.on 'operation', (opType, params) ->
       switch opType

@@ -14,12 +14,27 @@ class LineRawMessage extends Message
   # Represents LINE messages that are not suitable to treat as text messages.
   #
   # user            - The User object.
+  # robot           - A Robot instance.
   # id              - Identifier of the message.
   # contentType     - A numeric value indicating the type of message sent.
   # contentMetadata - Detailed information about the message.
   # location        - Location data. This property is defined if the text message sent contains location data.
-  constructor: (@user, @id, @contentType, @contentMetadata, @location) ->
+  constructor: (@user, @robot, @id, @contentType, @contentMetadata, @location) ->
     super @user
+
+  content: (callback) ->
+    @robot.http({}, {})
+      .path("/v1/bot/message/#{@id}/content")
+      .encoding('binary')
+      .get() (err, res, body) ->
+        callback body, err, res 
+
+  previewContent: (callback)->
+    @robot.http({}, {})
+      .path("/v1/bot/message/#{@id}/content/preview")
+      .encoding('binary')
+      .get() (err, res, body) ->
+        callback body, err, res
 
 
 
@@ -27,11 +42,12 @@ class LineImageMessage extends LineRawMessage
   # LINE image message
   #
   # user            - The User object.
+  # robot           - A Robot instance.
   # id              - Identifier of the message.
   # contentType     - A numeric value indicating the type of message sent.
   # contentMetadata - Detailed information about the message.
   # location        - Location data. This property is defined if the text message sent contains location data.
-  constructor: (@user, @id, @contentType, @contentMetadata, @location = "") ->
+  constructor: (@user, @robot, @id, @contentType, @contentMetadata, @location = "") ->
 
 
 
@@ -39,11 +55,12 @@ class LineVideoMessage extends LineRawMessage
   # LINE video message
   #
   # user            - The User object.
+  # robot           - A Robot instance.
   # id              - Identifier of the message.
   # contentType     - A numeric value indicating the type of message sent.
   # contentMetadata - Detailed information about the message.
   # location        - Location data. This property is defined if the text message sent contains location data.
-  constructor: (@user, @id, @contentType, @contentMetadata, @location = "") ->
+  constructor: (@user, @robot, @id, @contentType, @contentMetadata, @location = "") ->
 
 
 
@@ -51,11 +68,12 @@ class LineAudioMessage extends LineRawMessage
   # LINE audio message
   #
   # user            - The User object.
+  # robot           - A Robot instance.
   # id              - Identifier of the message.
   # contentType     - A numeric value indicating the type of message sent.
   # contentMetadata - Detailed information about the message.
   # location        - Location data. This property is defined if the text message sent contains location data.
-  constructor: (@user, @id, @contentType, @contentMetadata, @location = "") ->
+  constructor: (@user, @robot, @id, @contentType, @contentMetadata, @location = "") ->
 
 
 
@@ -63,11 +81,12 @@ class LineLocationMessage extends LineRawMessage
   # LINE location message
   #
   # user            - The User object.
+  # robot           - A Robot instance.
   # id              - Identifier of the message.
   # contentType     - A numeric value indicating the type of message sent.
   # contentMetadata - Detailed information about the message.
   # location        - Location data. This property is defined if the text message sent contains location data.
-  constructor: (@user, @id, @contentType, @contentMetadata, @location) ->
+  constructor: (@user, @robot, @id, @contentType, @contentMetadata, @location) ->
     @title = @location.title
     @address = @location.address
     @latitude = @location.latitude
@@ -80,11 +99,12 @@ class LineStickerMessage extends LineRawMessage
   # LINE sticker message
   #
   # user            - The User object.
+  # robot           - A Robot instance.
   # id              - Identifier of the message.
   # contentType     - A numeric value indicating the type of message sent.
   # contentMetadata - Detailed information about the message.
   # location        - Location data. This property is defined if the text message sent contains location data.
-  constructor: (@user, @id, @contentType, @contentMetadata, @location = "") ->
+  constructor: (@user, @robot, @id, @contentType, @contentMetadata, @location = "") ->
     @STKPKGID = @contentMetadata.STKPKGID
     @STKID = @contentMetadata.STKID
     @STKVER = @contentMetadata.STKVER
@@ -97,11 +117,12 @@ class LineContactMessage extends LineRawMessage
   # LINE contact message
   #
   # user            - The User object.
+  # robot           - A Robot instance.
   # id              - Identifier of the message.
   # contentType     - A numeric value indicating the type of message sent.
   # contentMetadata - Detailed information about the message.
   # location        - Location data. This property is defined if the text message sent contains location data.
-  constructor: (@user, @id, @contentType, @contentMetadata, @location = "") ->
+  constructor: (@user, @robot, @id, @contentType, @contentMetadata, @location = "") ->
     @mid = @contentMetadata.mid
     @displayName = @contentMetadata.displayName
     super @user, @id, @contentType, @contentMetadata, @location
