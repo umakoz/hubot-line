@@ -211,6 +211,10 @@ You can use the stickers shown in the [sticker list](https://developers.line.me/
     * STKPKGID - Package ID of the sticker
     * STKVER - Optional. Version number of the sticker. If omitted, the latest version number is applied
 
+## Example
+
+Please refer to [an example](https://github.com/umakoz/hubot-line-example) hubot project on Heroku.
+
 ## Contribute
 
 Just send pull request if needed or fill an issue !
