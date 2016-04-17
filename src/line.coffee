@@ -31,11 +31,22 @@ class LineAdapter extends Adapter
     @robot.logger.debug 'LINE run'
 
     options =
-      channel_id:     process.env.HUBOT_LINE_CHANNEL_ID
-      channel_secret: process.env.HUBOT_LINE_CHANNEL_SECRET
-      channel_mid:    process.env.HUBOT_LINE_CHANNEL_MID
-      callback_path:  process.env.HUBOT_LINE_CALLBACK_PATH or '/hubot/line/callback'
-      proxy:          process.env.HUBOT_LINE_PROXY_URL or process.env.FIXIE_URL
+      channelId:     process.env.HUBOT_LINE_CHANNEL_ID
+      channelSecret: process.env.HUBOT_LINE_CHANNEL_SECRET
+      channelMid:    process.env.HUBOT_LINE_CHANNEL_MID
+      callbackPath:  process.env.HUBOT_LINE_CALLBACK_PATH or '/hubot/line/callback'
+      proxy:         process.env.HUBOT_LINE_PROXY_URL or process.env.FIXIE_URL
+
+    @lineHttpOptions =
+      protocol: 'https:'
+      hostname: 'trialbot-api.line.me'
+      port:     443
+      headers:
+        'X-Line-ChannelID':             options.channelId
+        'X-Line-ChannelSecret':         options.channelSecret
+        'X-Line-Trusted-User-With-ACL': options.channelMid
+    if options.proxy
+      @lineHttpOptions.agent = new HttpsProxyAgent options.proxy
 
     bot = new LineStreaming(options, @robot)
 
@@ -97,17 +108,6 @@ class LineStreaming extends EventEmitter
   constructor: (options, @robot) ->
     @options = options
 
-    @robot.globalHttpOptions =
-      protocol: 'https:'
-      hostname: 'trialbot-api.line.me'
-      port:     443
-      headers:
-        'X-Line-ChannelID':             @options.channel_id
-        'X-Line-ChannelSecret':         @options.channel_secret
-        'X-Line-Trusted-User-With-ACL': @options.channel_mid
-    if @options.proxy
-      @robot.globalHttpOptions.agent = new HttpsProxyAgent @options.proxy
-
 
   send: (to, message) ->
     @robot.logger.debug "LINE send [#{message}] to [#{to}]"
@@ -133,7 +133,7 @@ class LineStreaming extends EventEmitter
       escape(match).replace /%u/g, "\\u"
     logger.debug "LINE _request body [#{body}]"
 
-    @robot.http({}, {})
+    @robot.http({}, @robot.adapter.lineHttpOptions)
       .path("/v1/events")
       .header('Content-Type', 'application/json')
       .post(body) (err, res, body) ->
@@ -144,7 +144,7 @@ class LineStreaming extends EventEmitter
 
 
   listen: ->
-    @robot.router.post @options.callback_path, (request, response) =>
+    @robot.router.post @options.callbackPath, (request, response) =>
       @robot.logger.debug "LINE listen [#{JSON.stringify(request.body.result)}]"
       for result in request.body.result
         content = result.content

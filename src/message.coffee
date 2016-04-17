@@ -23,14 +23,14 @@ class LineRawMessage extends Message
     super @user
 
   content: (callback) ->
-    @robot.http({}, {})
+    @robot.http({}, @robot.adapter.lineHttpOptions)
       .path("/v1/bot/message/#{@id}/content")
       .encoding('binary')
       .get() (err, res, body) ->
         callback body, err, res 
 
   previewContent: (callback)->
-    @robot.http({}, {})
+    @robot.http({}, @robot.adapter.lineHttpOptions)
       .path("/v1/bot/message/#{@id}/content/preview")
       .encoding('binary')
       .get() (err, res, body) ->
