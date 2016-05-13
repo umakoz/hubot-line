@@ -130,7 +130,11 @@ class LineStreaming extends EventEmitter
       eventType: "138311608800106203" # Fixed value
       content: action.requestParameters()
     body = body.replace /[\u0080-\uFFFF]/g, (match) ->
-      escape(match).replace /%u/g, "\\u"
+      if /[\u0080-\u00FF]/.test match
+        # If code unit value is 0xFF or less it become a two-digit escape.
+        escape(match).replace /%/g, "\\u00"
+      else
+        escape(match).replace /%u/g, "\\u"
     logger.debug "LINE _request body [#{body}]"
 
     @robot.http({}, @robot.adapter.lineHttpOptions)
